@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package endpoint;
+
+import "google/protobuf/empty.proto";
+
+option go_package = ".;pb";
+
+message GetEndpointsRequest {
+  string Name = 1;
+  string EndpointType = 2;
+}
+
+message Endpoint {
+  string Id = 1;
+  string Name = 2;
+  string EndpointType = 3;
+  string Description = 4;
+  string CreatedAt = 5;
+  string UpdatedAt = 6;
+  string DeletedAt = 7;
+}
+
+message GetEndpointsResponse {
+  repeated Endpoint Endpoints = 1;
+}
+
+message InsertEndpointRequest {
+  string Name = 2;
+  string EndpointType = 3;
+  string Description = 4;
+}
+
+message InsertEndpointResponse {
+  string Id = 1;
+  string Name = 2;
+  string EndpointType = 3;
+  string Description = 4;
+}
+
+message UpdateEndpointRequest {
+  string Id = 1;
+  string Name = 2;
+  string EndpointType = 3;
+  string Description = 4;
+}
+
+message DeleteEndpointRequest {
+  string Id = 1;
+  bool SoftDelete = 2;
+}
+
+service EndpointService {
+  rpc GetEndpoints(GetEndpointsRequest) returns (GetEndpointsResponse);
+  rpc InsertEndpoint(InsertEndpointRequest) returns (InsertEndpointResponse);
+  rpc UpdateEndpoint(UpdateEndpointRequest) returns (google.protobuf.Empty);
+  rpc DeleteEndpoint(DeleteEndpointRequest) returns (google.protobuf.Empty);
+}

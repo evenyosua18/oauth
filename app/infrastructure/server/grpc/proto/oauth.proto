@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package oauth;
+
+import "google/protobuf/empty.proto";
+
+option go_package = ".;pb";
+
+message PasswordGrantRequest {
+  string ClientId = 1;
+  string ClientSecret = 2;
+  string Username = 3;
+  string Password = 4;
+  string Scopes = 5;
+}
+
+message ClientCredentialRequest {
+  string ClientId = 1;
+  string ClientSecret = 2;
+  string Scopes = 3;
+}
+
+message AccessTokenResponse {
+  string AccessToken = 1;
+  string RefreshToken = 2;
+  string ExpireAt = 3;
+}
+
+message CheckClientRequest {
+  string ClientId = 1;
+  string Scopes = 2;
+  string ResponseType = 3;
+}
+
+message CheckClientResponse {
+  string URL = 1;
+}
+
+message LoginRequest {
+  string Code = 1;
+  string Username = 2;
+  string Password = 3;
+}
+
+message LoginResponse {
+  string URL = 1;
+}
+
+message AuthorizationCodeRequest {
+  string ClientId = 1;
+  string ClientSecret = 2;
+  string Code = 3;
+}
+
+service AccessToken {
+  rpc PasswordGrant(PasswordGrantRequest) returns (AccessTokenResponse);
+  rpc ClientCredential(ClientCredentialRequest) returns (AccessTokenResponse);
+  rpc CheckClient(CheckClientRequest) returns (CheckClientResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc AuthorizationCode(AuthorizationCodeRequest) returns (AccessTokenResponse);
+}
+
+message AuthenticateRequest {
+  string AccessToken = 1;
+}
+
+message AuthenticateResponse {
+  string ExpireAt = 1;
+}
+
+message LogoutRequest {
+  string AccessToken = 1;
+}
+
+service Authentication {
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty);
+}
+
