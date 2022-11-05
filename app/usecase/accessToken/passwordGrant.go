@@ -2,6 +2,7 @@ package accessToken
 
 import (
 	"context"
+	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/domain/entity"
 	"github.com/evenyosua18/oauth/util/tracer"
 	"github.com/mitchellh/mapstructure"
@@ -40,8 +41,14 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	tracer.LogResponse(sp, oauthClient)
 
 	//check client secret
+	if req.ClientSecret != oauthClient.ClientSecret {
+		tracer.LogError(sp, tracer.Checking, constant.ErrInvalidClientSecret)
+		return nil, err
+	}
 
 	//check scopes
+
+	//get user by username or email or phone
 
 	return i.out.AccessTokenResponse(&entity.AccessTokenResponse{})
 }
