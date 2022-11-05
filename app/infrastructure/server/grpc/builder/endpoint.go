@@ -1,7 +1,7 @@
 package builder
 
 import (
-	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/proto/pb"
+	"github.com/evenyosua18/oauth/app/infrastructure/proto/pb"
 	"github.com/mitchellh/mapstructure"
 )
 

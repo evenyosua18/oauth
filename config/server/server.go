@@ -1,8 +1,10 @@
 package server
 
-type ListServer struct {
-	Debug string `yaml:"debug"`
-	Grpc  Server `yaml:"grpc"`
+type ConfigServer struct {
+	Debug       string `yaml:"debug"`
+	ServiceName string `yaml:"serviceName"`
+	Grpc        Server `yaml:"grpc"`
+	Tracer      Tracer `yaml:"tracer"`
 }
 
 type Server struct {
@@ -10,4 +12,11 @@ type Server struct {
 	Port    int    `yaml:"port"`
 	TLS     bool   `yaml:"tls"`
 	Timeout int    `yaml:"timeout"`
+	MaxIdle string `yaml:"maxIdle"`
+	MaxAge  string `yaml:"maxAge"`
+}
+
+type Tracer struct {
+	Endpoint string `yaml:"endpoint"`
+	Env      string `yaml:"env"`
 }

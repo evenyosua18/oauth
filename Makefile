@@ -1,13 +1,13 @@
 clean:
 	@echo "--- cleanup all build and generated files ---"
-	@rm -vf app/infrastructure/server/grpc/proto/pb/*.pb.go
+	@rm -vf app/infrastructure//proto/pb/*.pb.go
 
 protoc: clean
 	@echo "--- preparing proto output directories ---"
-	@mkdir -p app/infrastructure/server/grpc/proto/pb
+	@mkdir -p app/infrastructure/proto/pb
 
 	@echo "--- Compiling all proto files ---"
-	@cd ./app/infrastructure/server/grpc/proto && protoc -I. --go_out=plugins=grpc:./pb --govalidators_out=./pb *.proto
+	@cd ./app/infrastructure/proto && protoc -I. --go_out=plugins=grpc:./pb --govalidators_out=./pb *.proto
 
 setup:
 	@echo " --- Setup and generate configuration --- "

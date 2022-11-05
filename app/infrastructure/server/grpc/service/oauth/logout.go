@@ -2,7 +2,7 @@ package oauth
 
 import (
 	"context"
-	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/proto/pb"
+	"github.com/evenyosua18/oauth/app/infrastructure/proto/pb"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 

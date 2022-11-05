@@ -21,6 +21,8 @@ const (
 
 	ScanRow    = "Scan Row DB Response"
 	AfterQuery = "Do After Query"
+	Checking   = "Checking Proses"
+	Validation = "Validation Proses"
 
 	PrintRequest     = "Print Request"
 	PrintResponse    = "Print Response"

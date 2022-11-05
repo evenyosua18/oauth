@@ -3,7 +3,7 @@ package grpc
 import (
 	"fmt"
 	"github.com/evenyosua18/oauth/app/constant"
-	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/proto/pb"
+	"github.com/evenyosua18/oauth/app/infrastructure/proto/pb"
 	endpointSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/endpoint"
 	oauthSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/oauth"
 	"github.com/evenyosua18/oauth/app/usecase"
@@ -26,13 +26,16 @@ import (
 func RunServer() {
 	/*start service*/
 
+	//get config
+	cfg := config.GetConfig().Server
+
 	//setup jaeger
 	jaegerModel := tracer.SetupJaeger{
-		ServiceName: "oauth-service",
-		Endpoints:   "http://localhost:14268/api/traces",
+		ServiceName: cfg.ServiceName,
+		Endpoints:   cfg.Tracer.Endpoint,
 	}
 
-	jaegerModel.SetAttribute("environment", "development")
+	jaegerModel.SetAttribute("environment", cfg.Tracer.Env)
 
 	tp, err := tracer.New(jaegerModel)
 	if err != nil {
@@ -42,10 +45,29 @@ func RunServer() {
 
 	//config grpc server
 	var options []grpc.ServerOption
+
+	maxIdle, err := time.ParseDuration(cfg.Grpc.MaxIdle + "h")
+
+	if err != nil {
+		panic(err)
+	}
+
+	maxAge, err := time.ParseDuration(cfg.Grpc.MaxAge + "m")
+
+	if err != nil {
+		panic(err)
+	}
+
+	maxAgeGrace, err := time.ParseDuration(cfg.Grpc.MaxAge + "s")
+
+	if err != nil {
+		panic(err)
+	}
+
 	options = append(options, grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle:     1 * time.Hour,
-		MaxConnectionAge:      5 * time.Minute,
-		MaxConnectionAgeGrace: 5 * time.Second,
+		MaxConnectionIdle:     maxIdle * time.Hour,
+		MaxConnectionAge:      maxAge * time.Minute,
+		MaxConnectionAgeGrace: maxAgeGrace * time.Second,
 	}))
 
 	//create grpc server
@@ -59,9 +81,8 @@ func RunServer() {
 	reflection.Register(grpcServer)
 
 	//run grpc server
-	grpcConfig := config.GetConfig().Server.Grpc
 	go func() {
-		lis, err := net.Listen("tcp", fmt.Sprintf(`%s:%d`, grpcConfig.Host, grpcConfig.Port))
+		lis, err := net.Listen("tcp", fmt.Sprintf(`%s:%d`, cfg.Grpc.Host, cfg.Grpc.Port))
 
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
@@ -72,7 +93,7 @@ func RunServer() {
 		}
 	}()
 
-	log.Println(fmt.Sprintf("grpc server is running at %s:%d", grpcConfig.Host, grpcConfig.Port))
+	log.Println(fmt.Sprintf("grpc server is running at %s:%d", cfg.Grpc.Host, cfg.Grpc.Port))
 
 	//get signal when server interrupted
 	c := make(chan os.Signal)

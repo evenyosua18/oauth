@@ -12,7 +12,7 @@ import (
 
 type configuration struct {
 	Database database.ListDatabase
-	Server   server.ListServer
+	Server   server.ConfigServer
 }
 
 const (
@@ -37,7 +37,7 @@ func init() {
 
 	//import server.yml
 	var serverFile []byte
-	var serverConf server.ListServer
+	var serverConf server.ConfigServer
 
 	if serverFile, err = ioutil.ReadFile(location + serverLocation); err != nil {
 		panic(err)
