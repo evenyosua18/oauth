@@ -6,4 +6,5 @@ import "errors"
 var (
 	// authentication use case
 	ErrInvalidClientSecret = errors.New("invalid client secret")
+	ErrInvalidPassword     = errors.New("invalid password")
 )

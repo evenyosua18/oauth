@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/evenyosua18/oauth/app/constant"
+	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -22,4 +24,33 @@ type User struct {
 
 func (User) TableName() string {
 	return string(constant.UserTable)
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	uid, err := uuid.NewUUID()
+
+	if err != nil {
+		return err
+	}
+
+	u.Id = uid.String()
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+	return nil
+}
+
+func (u User) GetIdColumn() string {
+	return "id"
+}
+
+func (u User) GetNameColumn() string {
+	return "name"
+}
+
+func (u User) GetEmailColumn() string {
+	return "email"
+}
+
+func (u User) GetPhoneColumn() string {
+	return "phone"
 }

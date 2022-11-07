@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = ".;pb";
+
+message InsertUserRequest {
+  string name = 1;
+  string password = 2;
+  string email = 3;
+  string phone = 4;
+  string is_active = 5;
+}
+
+message InsertUserResponse {
+  string id = 1;
+}
+
+service UserService {
+  rpc InsertUser(InsertUserRequest) returns (InsertUserResponse);
+}

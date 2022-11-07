@@ -15,6 +15,7 @@ type OutputPortAccessToken interface {
 
 type InteractionAccessToken struct {
 	repo oauth_db.OauthClientRepository
+	user oauth_db.UserRepository
 	out  OutputPortAccessToken
 }
 
