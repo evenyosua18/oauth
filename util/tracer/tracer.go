@@ -18,16 +18,26 @@ const (
 	CallDatabase    = "Call Database"
 	CallRepository  = "Call Repository"
 	CallInteraction = "Call Interaction"
+	CallUtility     = "Call Utility"
 
 	ScanRow    = "Scan Row DB Response"
 	AfterQuery = "Do After Query"
 	Checking   = "Checking Proses"
 	Validation = "Validation Proses"
+	Generator  = "Generate Process"
 
 	PrintRequest     = "Print Request"
 	PrintResponse    = "Print Response"
 	PrintInformation = "Print Information"
 )
+
+var (
+	Before = before
+)
+
+func before(desc string) string {
+	return "Before " + desc
+}
 
 const (
 	requestName  = "request"

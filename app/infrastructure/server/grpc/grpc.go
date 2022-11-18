@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/infrastructure/proto/pb"
+	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/middleware"
 	endpointSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/endpoint"
 	oauthSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/oauth"
+	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/registration"
 	"github.com/evenyosua18/oauth/app/usecase"
 	accessTokenUC "github.com/evenyosua18/oauth/app/usecase/accessToken"
 	endpointUC "github.com/evenyosua18/oauth/app/usecase/endpoint"
+	registrationUC "github.com/evenyosua18/oauth/app/usecase/registration"
 	"github.com/evenyosua18/oauth/config"
+	"github.com/evenyosua18/oauth/util/logger"
 	"github.com/evenyosua18/oauth/util/tracer"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -65,10 +69,12 @@ func RunServer() {
 	}
 
 	options = append(options, grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle:     maxIdle * time.Hour,
-		MaxConnectionAge:      maxAge * time.Minute,
-		MaxConnectionAgeGrace: maxAgeGrace * time.Second,
+		MaxConnectionIdle:     maxIdle,
+		MaxConnectionAge:      maxAge,
+		MaxConnectionAgeGrace: maxAgeGrace,
 	}))
+
+	options = append(options, grpc.UnaryInterceptor(middleware.ChainUnaryServer(middleware.PanicRecovery())))
 
 	//create grpc server
 	grpcServer := grpc.NewServer(options...)
@@ -85,11 +91,11 @@ func RunServer() {
 		lis, err := net.Listen("tcp", fmt.Sprintf(`%s:%d`, cfg.Grpc.Host, cfg.Grpc.Port))
 
 		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
+			logger.Log(logger.Fatal, "", err)
 		}
 
 		if err = grpcServer.Serve(lis); err != nil {
-			log.Fatalf("failed to start grpc server: %v", err)
+			logger.Log(logger.Fatal, "failed to start grpc server", err)
 		}
 	}()
 
@@ -106,4 +112,5 @@ func Apply(server *grpc.Server, ctn *usecase.Container) {
 	pb.RegisterEndpointServiceServer(server, endpointSvc.NewServiceEndpoint(ctn.Resolve(string(constant.EndpointCTN)).(*endpointUC.InteractionEndpoint)))
 	pb.RegisterAuthenticationServer(server, oauthSvc.NewServiceAuthentication())
 	pb.RegisterAccessTokenServer(server, oauthSvc.NewServiceAccessToken(ctn.Resolve(string(constant.AccessTokenCTN)).(*accessTokenUC.InteractionAccessToken)))
+	pb.RegisterRegistrationUserServiceServer(server, registration.NewServiceRegistration(ctn.Resolve(string(constant.RegistrationCTN)).(*registrationUC.InteractionRegistration)))
 }

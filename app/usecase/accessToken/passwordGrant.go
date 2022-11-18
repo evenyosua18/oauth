@@ -2,6 +2,7 @@ package accessToken
 
 import (
 	"context"
+	"fmt"
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/domain/entity"
 	"github.com/evenyosua18/oauth/util/encryption"
@@ -33,7 +34,7 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	//check client secret
 	if req.ClientSecret != oauthClient.ClientSecret {
 		tracer.LogError(sp, tracer.Checking, constant.ErrInvalidClientSecret)
-		return nil, err
+		return nil, constant.ErrInvalidClientSecret
 	}
 
 	//check scopes
@@ -50,11 +51,35 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 		return nil, constant.ErrInvalidPassword
 	}
 
+	//save token
+
+	//generate refresh token
+
+	//save refresh token
+
+	//generate token
+	token, err := encryption.GenerateToken("1", "111", user.Name)
+	if err != nil {
+		tracer.LogError(sp, tracer.Generator, err)
+		return nil, err
+	}
+	tracer.LogResponse(sp, token)
+
+	//check token
+	claims, err := encryption.ValidateToken(token)
+	if err != nil {
+		tracer.LogError(sp, tracer.Checking, err)
+		return nil, err
+	}
+
+	fmt.Println(claims, "aab")
+
 	return i.out.AccessTokenResponse(&entity.AccessTokenResponse{})
 }
 
 func (i *InteractionAccessToken) getOauthClient(ctx context.Context, sp trace.Span, clientId string) (*entity.GetOauthClientResponse, error) {
 	//get oauth client
+	tracer.LogObject(sp, tracer.Before(tracer.CallRepository), clientId)
 	oauthClientResponse, err := i.repo.GetOauthClient(ctx, &entity.GetOauthClientRequest{
 		ClientId: clientId,
 	})
@@ -77,7 +102,8 @@ func (i *InteractionAccessToken) getOauthClient(ctx context.Context, sp trace.Sp
 
 func (i *InteractionAccessToken) getUser(ctx context.Context, sp trace.Span, username string) (*entity.GetUserResponse, error) {
 	//get user by username or email or phone
-	userResponse, err := i.user.GetUser(ctx, &entity.GetUserRequest{
+	tracer.LogObject(sp, tracer.Before(tracer.CallRepository), username)
+	userResponse, err := i.user.GetUser(ctx, entity.GetUserRequest{
 		Value: username,
 	})
 

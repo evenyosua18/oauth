@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"github.com/evenyosua18/oauth/app/constant"
+	"github.com/evenyosua18/oauth/app/domain/entity"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/model"
 	"github.com/evenyosua18/oauth/config"
 	"github.com/evenyosua18/oauth/util/tracer"
@@ -45,11 +46,27 @@ func (r *RepositoryUser) GetUser(context context.Context, in interface{}) (inter
 	}
 
 	//call db
-	if err := db.Take(user).Error; err != nil {
+	if err := db.Take(&user).Error; err != nil {
 		tracer.LogError(sp, tracer.CallDatabase, err)
 		return nil, err
 	}
 
+	deletedAt := ""
+
+	if user.DeletedAt != nil {
+		deletedAt = user.DeletedAt.String()
+	}
+
 	tracer.LogResponse(sp, user)
-	return nil, nil
+	return &entity.GetUserResponse{
+		Id:        user.Id,
+		Name:      user.Name,
+		Password:  user.Password,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		IsActive:  user.IsActive,
+		CreatedAt: user.CreatedAt.String(),
+		UpdateAt:  user.UpdatedAt.String(),
+		DeletedAt: deletedAt,
+	}, nil
 }

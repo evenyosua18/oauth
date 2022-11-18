@@ -19,9 +19,10 @@ type InteractionAccessToken struct {
 	out  OutputPortAccessToken
 }
 
-func NewInteractionAccessToken(r oauth_db.OauthClientRepository, o OutputPortAccessToken) *InteractionAccessToken {
+func NewInteractionAccessToken(r oauth_db.OauthClientRepository, u oauth_db.UserRepository, o OutputPortAccessToken) *InteractionAccessToken {
 	return &InteractionAccessToken{
 		repo: r,
+		user: u,
 		out:  o,
 	}
 }

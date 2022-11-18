@@ -6,8 +6,10 @@ import (
 	"github.com/evenyosua18/oauth/app/repository"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/endpoint"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/oauth_client"
+	"github.com/evenyosua18/oauth/app/repository/oauth_db/user"
 	accessTokenUC "github.com/evenyosua18/oauth/app/usecase/accessToken"
 	endpointUC "github.com/evenyosua18/oauth/app/usecase/endpoint"
+	registrationUC "github.com/evenyosua18/oauth/app/usecase/registration"
 	"github.com/sarulabs/di"
 )
 
@@ -25,6 +27,7 @@ func NewContainer() *Container {
 	if err = builder.Add([]di.Def{
 		{Name: string(constant.EndpointCTN), Build: endpointInteraction},
 		{Name: string(constant.AccessTokenCTN), Build: accessTokenInteraction},
+		{Name: string(constant.RegistrationCTN), Build: registrationInteraction},
 	}...); err != nil {
 		panic(err)
 	}
@@ -48,6 +51,14 @@ func endpointInteraction(_ di.Container) (interface{}, error) {
 // access token interaction
 func accessTokenInteraction(_ di.Container) (interface{}, error) {
 	repo := oauth_client.NewOauthClientRepository(repository.OauthDB)
+	userRepo := user.NewUserRepository(repository.OauthDB)
 	out := &builder.AccessTokenBuilder{}
-	return accessTokenUC.NewInteractionAccessToken(repo, out), nil
+	return accessTokenUC.NewInteractionAccessToken(repo, userRepo, out), nil
+}
+
+// registration interaction
+func registrationInteraction(_ di.Container) (interface{}, error) {
+	repo := user.NewUserRepository(repository.OauthDB)
+	out := &builder.RegistrationBuilder{}
+	return registrationUC.NewInteractionRegistration(repo, out), nil
 }

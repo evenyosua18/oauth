@@ -7,7 +7,6 @@ import (
 
 type AccessToken struct {
 	Id            string `gorm:"size:36;primaryKey"`
-	AccessToken   string `gorm:"size:350"`
 	IpAddress     string `gorm:"size:50"`
 	ExpireAt      time.Time
 	UserId        string `gorm:"size:36"`
