@@ -2,21 +2,15 @@ package entity
 
 import "time"
 
-type PasswordGrantRequest struct {
-	ClientId     string
-	ClientSecret string
-	Username     string
-	Password     string
-	Scopes       string
-}
-
-type AccessTokenRequest struct {
+type InsertAccessTokenRequest struct {
+	Id            string
 	IpAddress     string
 	ExpireAt      time.Time
 	UserId        string
 	OauthClientId string
 }
 
+// AccessTokenResponse response get access token
 type AccessTokenResponse struct {
 	AccessToken  string
 	RefreshToken string

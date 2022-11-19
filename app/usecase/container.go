@@ -4,6 +4,7 @@ import (
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/builder"
 	"github.com/evenyosua18/oauth/app/repository"
+	"github.com/evenyosua18/oauth/app/repository/oauth_db/access_token"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/endpoint"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/oauth_client"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/user"
@@ -52,8 +53,9 @@ func endpointInteraction(_ di.Container) (interface{}, error) {
 func accessTokenInteraction(_ di.Container) (interface{}, error) {
 	repo := oauth_client.NewOauthClientRepository(repository.OauthDB)
 	userRepo := user.NewUserRepository(repository.OauthDB)
+	accessTokenRepo := access_token.NewAccessTokenRepository(repository.OauthDB)
 	out := &builder.AccessTokenBuilder{}
-	return accessTokenUC.NewInteractionAccessToken(repo, userRepo, out), nil
+	return accessTokenUC.NewInteractionAccessToken(repo, userRepo, accessTokenRepo, out), nil
 }
 
 // registration interaction

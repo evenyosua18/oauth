@@ -1,5 +1,14 @@
-server:
+debug: true
+serviceName: oauth-service
+tracer:
+  env: development
+  endpoint: http://localhost:14268/api/traces
+grpc:
   tls: false
   host: 127.0.0.1
   port: 8801
   timeout: 1500
+  maxIdle: 1
+  maxAge: 5
+token:
+  expired: 1

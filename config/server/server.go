@@ -5,6 +5,7 @@ type ConfigServer struct {
 	ServiceName string `yaml:"serviceName"`
 	Grpc        Server `yaml:"grpc"`
 	Tracer      Tracer `yaml:"tracer"`
+	Token       Token  `yaml:"token"`
 }
 
 type Server struct {
@@ -19,4 +20,8 @@ type Server struct {
 type Tracer struct {
 	Endpoint string `yaml:"endpoint"`
 	Env      string `yaml:"env"`
+}
+
+type Token struct {
+	Expired string `yaml:"expired"`
 }

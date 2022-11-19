@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/evenyosua18/oauth/app/constant"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -21,4 +23,20 @@ type AccessToken struct {
 
 func (AccessToken) TableName() string {
 	return string(constant.AccessTokenTable)
+}
+
+func (e *AccessToken) BeforeCreate(tx *gorm.DB) (err error) {
+	if e.Id == "" {
+		uid, err := uuid.NewUUID()
+
+		if err != nil {
+			return err
+		}
+
+		e.Id = uid.String()
+	}
+	
+	e.CreatedAt = time.Now()
+	e.UpdatedAt = time.Now()
+	return nil
 }

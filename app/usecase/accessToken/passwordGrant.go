@@ -8,8 +8,10 @@ import (
 	"github.com/evenyosua18/oauth/util/encryption"
 	"github.com/evenyosua18/oauth/util/str"
 	"github.com/evenyosua18/oauth/util/tracer"
+	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/trace"
+	"time"
 )
 
 func (i *InteractionAccessToken) PasswordGrant(context context.Context, in interface{}) (interface{}, error) {
@@ -55,16 +57,19 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 		return nil, constant.ErrInvalidPassword
 	}
 
-	//save token
-
 	//generate refresh token
 	response.RefreshToken = str.GenerateString(32)
 	tracer.LogObject(sp, tracer.Generator, response.RefreshToken)
 
-	//save refresh token
-
 	//generate token
-	token, err := encryption.GenerateToken("1", "111", user.Name)
+	tokenId, err := uuid.NewUUID()
+
+	if err != nil {
+		tracer.LogError(sp, tracer.Generator, err)
+		return nil, err
+	}
+
+	token, err := encryption.GenerateToken(i.ExpiredTime, tokenId.String(), user.Name)
 	if err != nil {
 		tracer.LogError(sp, tracer.Generator, err)
 		return nil, err
@@ -80,6 +85,22 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	}
 	tracer.LogObject(sp, tracer.PrintInformation, claims)
 	response.ExpireAt = fmt.Sprintf("%.0f", claims[constant.ClaimsExpired].(float64))
+
+	//save token
+	accessToken := entity.InsertAccessTokenRequest{
+		Id:            claims[constant.ClaimsId].(string),
+		IpAddress:     "",
+		ExpireAt:      time.Unix(int64(claims[constant.ClaimsExpired].(float64)), 0),
+		UserId:        user.Id,
+		OauthClientId: oauthClient.Id,
+	}
+
+	if err = i.accToken.InsertAccessToken(ctx, accessToken); err != nil {
+		tracer.LogError(sp, tracer.CallRepository, err)
+		return nil, err
+	}
+
+	//save refresh token
 
 	tracer.LogResponse(sp, response)
 	return i.out.AccessTokenResponse(response)
