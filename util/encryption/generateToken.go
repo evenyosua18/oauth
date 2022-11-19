@@ -2,6 +2,7 @@ package encryption
 
 import (
 	"errors"
+	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/golang-jwt/jwt"
 	"os"
 	"time"
@@ -36,9 +37,9 @@ func GenerateToken(tokenDuration, uuid, name string) (string, error) {
 	}
 
 	claims := make(jwt.MapClaims)
-	claims["username"] = name
-	claims["jti"] = uuid
-	claims["exp"] = time.Now().Add(maxAge).Unix()
+	claims[constant.ClaimsUsername] = name
+	claims[constant.ClaimsId] = uuid
+	claims[constant.ClaimsExpired] = time.Now().Add(maxAge).Unix()
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
 

@@ -6,6 +6,7 @@ import (
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/domain/entity"
 	"github.com/evenyosua18/oauth/util/encryption"
+	"github.com/evenyosua18/oauth/util/str"
 	"github.com/evenyosua18/oauth/util/tracer"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/trace"
@@ -16,6 +17,9 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	ctx, sp := tracer.ChildTracer(context)
 	defer sp.End()
 	tracer.LogRequest(sp, in)
+
+	//set up response
+	response := entity.AccessTokenResponse{}
 
 	//decode
 	var req *entity.PasswordGrantRequest
@@ -54,6 +58,8 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	//save token
 
 	//generate refresh token
+	response.RefreshToken = str.GenerateString(32)
+	tracer.LogObject(sp, tracer.Generator, response.RefreshToken)
 
 	//save refresh token
 
@@ -63,18 +69,20 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 		tracer.LogError(sp, tracer.Generator, err)
 		return nil, err
 	}
+	response.AccessToken = token
 	tracer.LogResponse(sp, token)
 
-	//check token
+	//get claims for get expired time
 	claims, err := encryption.ValidateToken(token)
 	if err != nil {
 		tracer.LogError(sp, tracer.Checking, err)
 		return nil, err
 	}
+	tracer.LogObject(sp, tracer.PrintInformation, claims)
+	response.ExpireAt = fmt.Sprintf("%.0f", claims[constant.ClaimsExpired].(float64))
 
-	fmt.Println(claims, "aab")
-
-	return i.out.AccessTokenResponse(&entity.AccessTokenResponse{})
+	tracer.LogResponse(sp, response)
+	return i.out.AccessTokenResponse(response)
 }
 
 func (i *InteractionAccessToken) getOauthClient(ctx context.Context, sp trace.Span, clientId string) (*entity.GetOauthClientResponse, error) {
