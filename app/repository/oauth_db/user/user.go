@@ -1,6 +1,6 @@
 package user
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type RepositoryUser struct {
 	db *gorm.DB

@@ -1,6 +1,6 @@
 package oauth_client
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type RepositoryOauthClient struct {
 	db *gorm.DB

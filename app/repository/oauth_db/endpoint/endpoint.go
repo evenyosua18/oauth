@@ -1,6 +1,6 @@
 package endpoint
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type RepositoryEndpoint struct {
 	db *gorm.DB

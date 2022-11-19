@@ -3,7 +3,7 @@ package model
 import (
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/google/uuid"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"time"
 )
 
