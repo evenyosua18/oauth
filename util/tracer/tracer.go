@@ -25,6 +25,7 @@ const (
 	Checking   = "Checking Proses"
 	Validation = "Validation Proses"
 	Generator  = "Generate Process"
+	Time       = "Process Time"
 
 	PrintRequest     = "Print Request"
 	PrintResponse    = "Print Response"

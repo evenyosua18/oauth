@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/config/database"
 	"github.com/evenyosua18/oauth/config/server"
 	"gopkg.in/yaml.v3"
@@ -66,4 +67,8 @@ func init() {
 
 func GetConfig() *configuration {
 	return &cfg
+}
+
+func (c configuration) IsDebugMode() bool {
+	return c.Server.Debug == constant.True
 }

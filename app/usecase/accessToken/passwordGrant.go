@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc/peer"
 	"time"
 )
 
@@ -19,6 +20,15 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	ctx, sp := tracer.ChildTracer(context)
 	defer sp.End()
 	tracer.LogRequest(sp, in)
+
+	//get ip
+	ip, ok := peer.FromContext(context)
+
+	if !ok {
+		tracer.LogError(sp, tracer.CallUtility, constant.ErrIP)
+		return nil, constant.ErrIP
+	}
+	tracer.LogObject(sp, tracer.PrintInformation, ip)
 
 	//set up response
 	response := entity.AccessTokenResponse{}
@@ -86,21 +96,20 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	tracer.LogObject(sp, tracer.PrintInformation, claims)
 	response.ExpireAt = fmt.Sprintf("%.0f", claims[constant.ClaimsExpired].(float64))
 
-	//save token
+	//save token & refresh token
 	accessToken := entity.InsertAccessTokenRequest{
 		Id:            claims[constant.ClaimsId].(string),
 		IpAddress:     "",
-		ExpireAt:      time.Unix(int64(claims[constant.ClaimsExpired].(float64)), 0),
+		ExpireAt:      time.Unix(int64(claims[constant.ClaimsExpired].(float64)), 0).Format(constant.DefaultDateTimeFormat),
 		UserId:        user.Id,
 		OauthClientId: oauthClient.Id,
+		RefreshToken:  response.RefreshToken,
 	}
 
 	if err = i.accToken.InsertAccessToken(ctx, accessToken); err != nil {
 		tracer.LogError(sp, tracer.CallRepository, err)
 		return nil, err
 	}
-
-	//save refresh token
 
 	tracer.LogResponse(sp, response)
 	return i.out.AccessTokenResponse(response)

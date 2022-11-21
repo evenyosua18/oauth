@@ -1,13 +1,12 @@
 package entity
 
-import "time"
-
 type InsertAccessTokenRequest struct {
 	Id            string
 	IpAddress     string
-	ExpireAt      time.Time
+	ExpireAt      string
 	UserId        string
 	OauthClientId string
+	RefreshToken  string
 }
 
 // AccessTokenResponse response get access token

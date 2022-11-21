@@ -7,4 +7,7 @@ var (
 	// authentication use case
 	ErrInvalidClientSecret = errors.New("invalid client secret")
 	ErrInvalidPassword     = errors.New("invalid password")
+
+	// general
+	ErrIP = errors.New("error get ip")
 )
