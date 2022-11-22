@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	defaultExpiredTime = "1"
+	defaultExpiredTime        = "1"
+	defaultLengthExpiredToken = 32
 )
 
 type InputPortAccessToken interface {
@@ -19,7 +20,8 @@ type OutputPortAccessToken interface {
 }
 
 type InteractionAccessToken struct {
-	ExpiredTime string
+	ExpiredTime        string
+	LengthRefreshToken int
 
 	repo     oauth_db.OauthClientRepository
 	user     oauth_db.UserRepository
@@ -37,6 +39,17 @@ func NewInteractionAccessToken(r oauth_db.OauthClientRepository, u oauth_db.User
 
 	//expired time
 	interaction.ExpiredTime = config.GetConfig().Server.Token.Expired
+
+	if interaction.ExpiredTime == "" {
+		interaction.ExpiredTime = defaultExpiredTime
+	}
+
+	//length of expired token
+	interaction.LengthRefreshToken = config.GetConfig().Server.Token.LengthExpired
+
+	if interaction.LengthRefreshToken == 0 {
+		interaction.LengthRefreshToken = defaultLengthExpiredToken
+	}
 
 	if interaction.ExpiredTime == "" {
 		interaction.ExpiredTime = defaultExpiredTime

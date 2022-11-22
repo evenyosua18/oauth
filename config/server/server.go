@@ -23,5 +23,6 @@ type Tracer struct {
 }
 
 type Token struct {
-	Expired string `yaml:"expired"`
+	Expired       string `yaml:"expired"`
+	LengthExpired int    `yaml:"lengthExpiredToken"`
 }
