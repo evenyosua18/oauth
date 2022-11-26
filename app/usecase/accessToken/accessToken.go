@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	defaultExpiredTime        = "1"
-	defaultLengthExpiredToken = 32
+	defaultExpiredTime        = "1" //in hours
+	defaultLengthExpiredToken = 32  //length of string the refresh token
 )
 
 type InputPortAccessToken interface {
