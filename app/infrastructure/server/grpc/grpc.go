@@ -11,6 +11,7 @@ import (
 	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/registration"
 	"github.com/evenyosua18/oauth/app/usecase"
 	accessTokenUC "github.com/evenyosua18/oauth/app/usecase/accessToken"
+	authenticationUC "github.com/evenyosua18/oauth/app/usecase/authentication"
 	endpointUC "github.com/evenyosua18/oauth/app/usecase/endpoint"
 	registrationUC "github.com/evenyosua18/oauth/app/usecase/registration"
 	"github.com/evenyosua18/oauth/config"
@@ -111,7 +112,7 @@ func RunServer() {
 
 func Apply(server *grpc.Server, ctn *usecase.Container) {
 	pb.RegisterEndpointServiceServer(server, endpointSvc.NewServiceEndpoint(ctn.Resolve(string(constant.EndpointCTN)).(*endpointUC.InteractionEndpoint)))
-	pb.RegisterAuthenticationServer(server, authenticationSvc.NewServiceAuthentication())
+	pb.RegisterAuthenticationServer(server, authenticationSvc.NewServiceAuthentication(ctn.Resolve(string(constant.AuthenticationCTN)).(*authenticationUC.InteractionAuthentication)))
 	pb.RegisterAccessTokenServer(server, accessTokenSvc.NewServiceAccessToken(ctn.Resolve(string(constant.AccessTokenCTN)).(*accessTokenUC.InteractionAccessToken)))
 	pb.RegisterRegistrationUserServiceServer(server, registration.NewServiceRegistration(ctn.Resolve(string(constant.RegistrationCTN)).(*registrationUC.InteractionRegistration)))
 }
