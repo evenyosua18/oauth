@@ -5,8 +5,9 @@ import (
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/infrastructure/proto/pb"
 	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/middleware"
+	accessTokenSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/accessToken"
+	authenticationSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/authentication"
 	endpointSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/endpoint"
-	oauthSvc "github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/oauth"
 	"github.com/evenyosua18/oauth/app/infrastructure/server/grpc/service/registration"
 	"github.com/evenyosua18/oauth/app/usecase"
 	accessTokenUC "github.com/evenyosua18/oauth/app/usecase/accessToken"
@@ -110,7 +111,7 @@ func RunServer() {
 
 func Apply(server *grpc.Server, ctn *usecase.Container) {
 	pb.RegisterEndpointServiceServer(server, endpointSvc.NewServiceEndpoint(ctn.Resolve(string(constant.EndpointCTN)).(*endpointUC.InteractionEndpoint)))
-	pb.RegisterAuthenticationServer(server, oauthSvc.NewServiceAuthentication())
-	pb.RegisterAccessTokenServer(server, oauthSvc.NewServiceAccessToken(ctn.Resolve(string(constant.AccessTokenCTN)).(*accessTokenUC.InteractionAccessToken)))
+	pb.RegisterAuthenticationServer(server, authenticationSvc.NewServiceAuthentication())
+	pb.RegisterAccessTokenServer(server, accessTokenSvc.NewServiceAccessToken(ctn.Resolve(string(constant.AccessTokenCTN)).(*accessTokenUC.InteractionAccessToken)))
 	pb.RegisterRegistrationUserServiceServer(server, registration.NewServiceRegistration(ctn.Resolve(string(constant.RegistrationCTN)).(*registrationUC.InteractionRegistration)))
 }

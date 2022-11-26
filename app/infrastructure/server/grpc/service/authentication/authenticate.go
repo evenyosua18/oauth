@@ -1,4 +1,4 @@
-package oauth
+package authentication
 
 import (
 	"context"
@@ -6,5 +6,6 @@ import (
 )
 
 func (s *ServiceAuthentication) Authenticate(context context.Context, request *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
+
 	return nil, nil
 }
