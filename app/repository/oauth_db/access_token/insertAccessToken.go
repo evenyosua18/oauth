@@ -17,6 +17,7 @@ type insertAccessToken struct {
 	UserId        string
 	OauthClientId string
 	RefreshToken  string
+	GrantType     string
 }
 
 func (r *RepositoryAccessToken) InsertAccessToken(context context.Context, in interface{}) error {
@@ -48,6 +49,7 @@ func (r *RepositoryAccessToken) InsertAccessToken(context context.Context, in in
 		ExpireAt:      expireAt,
 		UserId:        req.UserId,
 		OauthClientId: req.OauthClientId,
+		GrantType:     req.GrantType,
 		RefreshTokens: []model.RefreshToken{
 			{
 				RefreshToken:  req.RefreshToken,

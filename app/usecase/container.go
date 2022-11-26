@@ -70,5 +70,6 @@ func registrationInteraction(_ di.Container) (interface{}, error) {
 // authentication interaction
 func authenticationInteraction(_ di.Container) (interface{}, error) {
 	userRepo := user.NewUserRepository(repository.OauthDB)
-	return authenticationUC.NewInteractionAuthentication(userRepo), nil
+	accessTokenRepo := access_token.NewAccessTokenRepository(repository.OauthDB)
+	return authenticationUC.NewInteractionAuthentication(userRepo, accessTokenRepo), nil
 }

@@ -23,6 +23,10 @@ func init() {
 	if OauthDB, err = connectMysql(cfg.Database.Oauth); err != nil {
 		panic(err)
 	}
+
+	if cfg.IsDebugMode() {
+		OauthDB = OauthDB.Debug()
+	}
 }
 
 func connectMysql(db database.Database) (*gorm.DB, error) {

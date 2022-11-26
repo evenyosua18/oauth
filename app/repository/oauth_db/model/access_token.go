@@ -41,3 +41,7 @@ func (e *AccessToken) BeforeCreate(tx *gorm.DB) (err error) {
 	e.UpdatedAt = time.Now()
 	return nil
 }
+
+func (AccessToken) GetColumnId() string {
+	return "id"
+}

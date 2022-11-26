@@ -10,11 +10,13 @@ type InputPortAuthentication interface {
 }
 
 type InteractionAuthentication struct {
-	user oauth_db.UserRepository
+	user        oauth_db.UserRepository
+	accessToken oauth_db.AccessTokenRepository
 }
 
-func NewInteractionAuthentication(u oauth_db.UserRepository) *InteractionAuthentication {
+func NewInteractionAuthentication(u oauth_db.UserRepository, at oauth_db.AccessTokenRepository) *InteractionAuthentication {
 	return &InteractionAuthentication{
-		user: u,
+		user:        u,
+		accessToken: at,
 	}
 }
