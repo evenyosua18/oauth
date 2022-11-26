@@ -13,6 +13,7 @@ type AccessToken struct {
 	ExpireAt      time.Time
 	UserId        string `gorm:"size:36"`
 	OauthClientId string `gorm:"size:36"`
+	GrantType     string `gorm:"grant_type"`
 
 	RefreshTokens []RefreshToken `gorm:"foreignKey:AccessTokenId"`
 
@@ -35,7 +36,7 @@ func (e *AccessToken) BeforeCreate(tx *gorm.DB) (err error) {
 
 		e.Id = uid.String()
 	}
-	
+
 	e.CreatedAt = time.Now()
 	e.UpdatedAt = time.Now()
 	return nil

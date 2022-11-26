@@ -7,6 +7,7 @@ type InsertAccessTokenRequest struct {
 	UserId        string
 	OauthClientId string
 	RefreshToken  string
+	GrantType     string
 }
 
 // AccessTokenResponse response get access token

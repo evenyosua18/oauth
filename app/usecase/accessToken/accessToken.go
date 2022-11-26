@@ -69,7 +69,7 @@ func NewInteractionAccessToken(r oauth_db.OauthClientRepository, u oauth_db.User
 
 // general function
 
-func (i *InteractionAccessToken) generateAccessToken(ctx context.Context, sp trace.Span, username, userId, oauthClientId string) (response entity.AccessTokenResponse, err error) {
+func (i *InteractionAccessToken) generateAccessToken(ctx context.Context, sp trace.Span, username, userId, oauthClientId, grantType string) (response entity.AccessTokenResponse, err error) {
 	//get ip
 	ip, ok := peer.FromContext(ctx)
 
@@ -112,6 +112,7 @@ func (i *InteractionAccessToken) generateAccessToken(ctx context.Context, sp tra
 		UserId:        userId,
 		OauthClientId: oauthClientId,
 		RefreshToken:  response.RefreshToken,
+		GrantType:     grantType,
 	}
 
 	//call repository

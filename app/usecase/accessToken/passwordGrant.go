@@ -50,7 +50,7 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	}
 
 	//manage access token
-	accessToken, err := i.generateAccessToken(ctx, sp, user.Name, user.Id, oauthClient.Id)
+	accessToken, err := i.generateAccessToken(ctx, sp, user.Name, user.Id, oauthClient.Id, constant.Password)
 	if err != nil {
 		return nil, err
 	}

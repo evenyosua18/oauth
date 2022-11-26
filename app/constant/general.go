@@ -32,3 +32,11 @@ const (
 const (
 	ScopeSeparator = ","
 )
+
+// grant type
+const (
+	Password          = `password`
+	ClientCredentials = `client`
+	AuthorizationCode = `authorization`
+	ImplicitGrant     = `implicit`
+)
