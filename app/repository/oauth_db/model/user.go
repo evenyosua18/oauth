@@ -13,6 +13,7 @@ type User struct {
 	Password string `gorm:"size:255"`
 	Email    string `gorm:"size:100"`
 	Phone    string `gorm:"size:25"`
+	Scopes   string `gorm:"size:500"`
 	IsActive bool
 
 	RoleId string `gorm:"size:36"`

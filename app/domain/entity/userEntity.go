@@ -23,6 +23,7 @@ type GetUserResponse struct {
 	Password  string
 	Email     string
 	Phone     string
+	Scopes    string
 	IsActive  bool
 	CreatedAt string
 	UpdateAt  string

@@ -1,6 +1,7 @@
 package encryption
 
 import (
+	"crypto/rsa"
 	"errors"
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/golang-jwt/jwt"
@@ -17,37 +18,41 @@ type CustomClaims struct {
 	UserInformation
 }
 
-func GenerateToken(tokenDuration, uuid, name string) (string, error) {
-	maxAge, err := time.ParseDuration(tokenDuration + "h")
+func GenerateToken(tokenDuration, uuid, name string) (token string, expiredAt time.Time, err error) {
+	var maxAge time.Duration
+	maxAge, err = time.ParseDuration(tokenDuration + "h")
 
 	if err != nil {
-		return "", err
+		return
 	}
 
 	//read rsa key
-	rsaKey, err := os.ReadFile("./rsa.key")
+	var rsaKey []byte
+	rsaKey, err = os.ReadFile("./rsa.key")
 
 	if err != nil {
-		return "", err
+		return
 	}
 
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(rsaKey)
+	var key *rsa.PrivateKey
+	key, err = jwt.ParseRSAPrivateKeyFromPEM(rsaKey)
 	if err != nil {
-		return "", err
+		return
 	}
 
+	expiredAt = time.Now().Add(maxAge)
 	claims := make(jwt.MapClaims)
 	claims[constant.ClaimsUsername] = name
 	claims[constant.ClaimsId] = uuid
-	claims[constant.ClaimsExpired] = time.Now().Add(maxAge).Unix()
+	claims[constant.ClaimsExpired] = expiredAt.Unix()
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
+	token, err = jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
 
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return token, nil
+	return
 }
 
 func ValidateToken(token string) (jwt.MapClaims, error) {

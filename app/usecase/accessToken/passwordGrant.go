@@ -2,17 +2,13 @@ package accessToken
 
 import (
 	"context"
-	"fmt"
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/domain/entity"
 	"github.com/evenyosua18/oauth/util/encryption"
-	"github.com/evenyosua18/oauth/util/str"
 	"github.com/evenyosua18/oauth/util/tracer"
-	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc/peer"
-	"time"
+	"strings"
 )
 
 func (i *InteractionAccessToken) PasswordGrant(context context.Context, in interface{}) (interface{}, error) {
@@ -20,18 +16,6 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 	ctx, sp := tracer.ChildTracer(context)
 	defer sp.End()
 	tracer.LogRequest(sp, in)
-
-	//get ip
-	ip, ok := peer.FromContext(context)
-
-	if !ok {
-		tracer.LogError(sp, tracer.CallUtility, constant.ErrIP)
-		return nil, constant.ErrIP
-	}
-	tracer.LogObject(sp, tracer.PrintInformation, ip)
-
-	//set up response
-	response := entity.AccessTokenResponse{}
 
 	//decode
 	var req *entity.PasswordGrantRequest
@@ -53,10 +37,8 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 		return nil, constant.ErrInvalidClientSecret
 	}
 
-	//check scopes
-
 	//get user
-	user, err := i.getUser(ctx, sp, req.Username)
+	user, err := i.getUser(ctx, sp, req.Username, req.Scopes)
 	if err != nil {
 		return nil, err //tracer already inside the function
 	}
@@ -67,52 +49,14 @@ func (i *InteractionAccessToken) PasswordGrant(context context.Context, in inter
 		return nil, constant.ErrInvalidPassword
 	}
 
-	//generate refresh token
-	response.RefreshToken = str.GenerateString(32)
-	tracer.LogObject(sp, tracer.Generator, response.RefreshToken)
-
-	//generate token
-	tokenId, err := uuid.NewUUID()
-
+	//manage access token
+	accessToken, err := i.generateAccessToken(ctx, sp, user.Name, user.Id, oauthClient.Id)
 	if err != nil {
-		tracer.LogError(sp, tracer.Generator, err)
 		return nil, err
 	}
 
-	token, err := encryption.GenerateToken(i.ExpiredTime, tokenId.String(), user.Name)
-	if err != nil {
-		tracer.LogError(sp, tracer.Generator, err)
-		return nil, err
-	}
-	response.AccessToken = token
-	tracer.LogResponse(sp, token)
-
-	//get claims for get expired time
-	claims, err := encryption.ValidateToken(token)
-	if err != nil {
-		tracer.LogError(sp, tracer.Checking, err)
-		return nil, err
-	}
-	tracer.LogObject(sp, tracer.PrintInformation, claims)
-	response.ExpireAt = fmt.Sprintf("%.0f", claims[constant.ClaimsExpired].(float64))
-
-	//save token & refresh token
-	accessToken := entity.InsertAccessTokenRequest{
-		Id:            claims[constant.ClaimsId].(string),
-		IpAddress:     "",
-		ExpireAt:      time.Unix(int64(claims[constant.ClaimsExpired].(float64)), 0).Format(constant.DefaultDateTimeFormat),
-		UserId:        user.Id,
-		OauthClientId: oauthClient.Id,
-		RefreshToken:  response.RefreshToken,
-	}
-
-	if err = i.accToken.InsertAccessToken(ctx, accessToken); err != nil {
-		tracer.LogError(sp, tracer.CallRepository, err)
-		return nil, err
-	}
-
-	tracer.LogResponse(sp, response)
-	return i.out.AccessTokenResponse(response)
+	tracer.LogResponse(sp, accessToken)
+	return i.out.AccessTokenResponse(accessToken)
 }
 
 func (i *InteractionAccessToken) getOauthClient(ctx context.Context, sp trace.Span, clientId string) (*entity.GetOauthClientResponse, error) {
@@ -138,7 +82,7 @@ func (i *InteractionAccessToken) getOauthClient(ctx context.Context, sp trace.Sp
 	return oauthClient, nil
 }
 
-func (i *InteractionAccessToken) getUser(ctx context.Context, sp trace.Span, username string) (*entity.GetUserResponse, error) {
+func (i *InteractionAccessToken) getUser(ctx context.Context, sp trace.Span, username, reqScopes string) (*entity.GetUserResponse, error) {
 	//get user by username or email or phone
 	tracer.LogObject(sp, tracer.Before(tracer.CallRepository), username)
 	userResponse, err := i.user.GetUser(ctx, entity.GetUserRequest{
@@ -150,10 +94,26 @@ func (i *InteractionAccessToken) getUser(ctx context.Context, sp trace.Span, use
 		return nil, err
 	}
 
+	//decode
 	var user *entity.GetUserResponse
 	if err := mapstructure.Decode(userResponse, &user); err != nil {
 		tracer.LogError(sp, tracer.DecodeObject, err)
 		return nil, err
+	}
+
+	//check is active
+	if !user.IsActive {
+		tracer.LogError(sp, tracer.Checking, constant.ErrInactiveUser)
+		return nil, constant.ErrInactiveUser
+	}
+
+	//check scopes
+	scopes := strings.Split(reqScopes, constant.ScopeSeparator)
+
+	for _, scope := range scopes {
+		if !strings.Contains(user.Scopes, scope) {
+			return nil, constant.ErrInvalidScope(scope)
+		}
 	}
 
 	tracer.LogResponse(sp, user)

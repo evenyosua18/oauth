@@ -27,3 +27,8 @@ const (
 	DefaultDateTimeFormat = DefaultDateFormat + " " + DefaultTimeFormat //dd-mm-yyyy hh:mm:ss
 	ReadableDateFormat    = "02 Jan 2006"
 )
+
+// scope separator
+const (
+	ScopeSeparator = ","
+)
