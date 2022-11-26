@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package authentication;
+
+import "google/protobuf/empty.proto";
+
+option go_package = ".;pb";
+
+message AuthenticateRequest {
+  string AccessToken = 1;
+}
+
+message AuthenticateResponse {
+  string ExpireAt = 1;
+}
+
+message LogoutRequest {
+  string AccessToken = 1;
+}
+
+service Authentication {
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty);
+}

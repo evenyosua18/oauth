@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package oauth;
+package access_token;
 
 import "google/protobuf/empty.proto";
 
@@ -58,22 +58,5 @@ service AccessToken {
   rpc CheckClient(CheckClientRequest) returns (CheckClientResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc AuthorizationCode(AuthorizationCodeRequest) returns (AccessTokenResponse);
-}
-
-message AuthenticateRequest {
-  string AccessToken = 1;
-}
-
-message AuthenticateResponse {
-  string ExpireAt = 1;
-}
-
-message LogoutRequest {
-  string AccessToken = 1;
-}
-
-service Authentication {
-  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
-  rpc Logout(LogoutRequest) returns (google.protobuf.Empty);
 }
 
