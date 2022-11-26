@@ -22,7 +22,7 @@ const (
 
 // date time format
 const (
-	DefaultDateFormat     = "02-01-2006"                                //dd-mm-yyyy
+	DefaultDateFormat     = "2006-02-01"                                //dd-mm-yyyy
 	DefaultTimeFormat     = "15:04:05"                                  //hh:mm:ss
 	DefaultDateTimeFormat = DefaultDateFormat + " " + DefaultTimeFormat //dd-mm-yyyy hh:mm:ss
 	ReadableDateFormat    = "02 Jan 2006"

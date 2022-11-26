@@ -34,12 +34,13 @@ func (r *RepositoryAccessToken) InsertAccessToken(context context.Context, in in
 	tracer.LogObject(sp, tracer.DecodeObject, req)
 
 	//create access token model
-	expireAt, err := time.Parse(constant.DefaultDateTimeFormat, req.ExpireAt)
+	expireAt, err := time.ParseInLocation(constant.DefaultDateTimeFormat, req.ExpireAt, time.Local)
 
 	if err != nil {
 		tracer.LogError(sp, tracer.Time, err)
 		return err
 	}
+	tracer.LogObject(sp, tracer.Time, expireAt)
 
 	accessToken := model.AccessToken{
 		Id:            req.Id,

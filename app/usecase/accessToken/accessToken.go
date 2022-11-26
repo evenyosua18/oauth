@@ -115,6 +115,9 @@ func (i *InteractionAccessToken) generateAccessToken(ctx context.Context, sp tra
 		GrantType:     grantType,
 	}
 
+	//add to response struct
+	response.ExpireAt = accessToken.ExpireAt
+
 	//call repository
 	if err = i.accToken.InsertAccessToken(ctx, accessToken); err != nil {
 		tracer.LogError(sp, tracer.CallRepository, err)
