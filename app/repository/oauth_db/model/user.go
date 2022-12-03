@@ -8,15 +8,17 @@ import (
 )
 
 type User struct {
-	Id       string `gorm:"size:36;primaryKey"`
-	Name     string `gorm:"size:100"`
-	Password string `gorm:"size:255"`
-	Email    string `gorm:"size:100"`
-	Phone    string `gorm:"size:25"`
-	Scopes   string `gorm:"size:500"`
-	IsActive bool
+	Id          string `gorm:"size:36;primaryKey"`
+	Name        string `gorm:"size:100"`
+	Password    string `gorm:"size:255"`
+	Email       string `gorm:"size:100"`
+	Phone       string `gorm:"size:25"`
+	Scopes      string `gorm:"size:500"`
+	IsSuperRole bool
+	IsActive    bool
 
 	RoleId string `gorm:"size:36"`
+	Role   Role
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

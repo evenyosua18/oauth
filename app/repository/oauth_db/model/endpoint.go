@@ -13,6 +13,9 @@ type Endpoint struct {
 	EndpointType string `gorm:"size:4"`
 	Description  string `gorm:"size:255"`
 
+	Scopes []*Scope `gorm:"many2many:scope_endpoints;"`
+	Roles  []*Role  `gorm:"many2many:role_endpoints;"`
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time `sql:"index"`

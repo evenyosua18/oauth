@@ -13,7 +13,7 @@ type Role struct {
 	IsSuperRole bool
 
 	Endpoints []*Endpoint `gorm:"many2many:role_endpoints;"`
-	Users     []User      `gorm:"foreignKey:RoleId"`
+	Users     []User
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

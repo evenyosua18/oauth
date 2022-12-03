@@ -9,11 +9,13 @@ import (
 )
 
 type insertUser struct {
-	Name     string
-	Password string
-	Phone    string
-	Email    string
-	IsActive bool
+	Name        string
+	Password    string
+	Phone       string
+	Email       string
+	RoleId      string
+	IsActive    bool
+	IsSuperRole bool
 }
 
 func (i *InteractionRegistration) RegistrationUser(ctx context.Context, in interface{}) (interface{}, error) {
@@ -30,10 +32,12 @@ func (i *InteractionRegistration) RegistrationUser(ctx context.Context, in inter
 	}
 
 	insertUser := insertUser{
-		Name:     req.Name,
-		Phone:    req.Phone,
-		Email:    req.Email,
-		IsActive: true, //default
+		Name:        req.Name,
+		Phone:       req.Phone,
+		Email:       req.Email,
+		RoleId:      i.DefaultRoleId,
+		IsActive:    true,  //default
+		IsSuperRole: false, //default
 	}
 
 	//hash password

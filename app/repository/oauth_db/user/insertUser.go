@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"github.com/evenyosua18/oauth/app/constant"
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/model"
 	"github.com/evenyosua18/oauth/config"
@@ -32,7 +33,7 @@ func (r *RepositoryUser) InsertUser(context context.Context, in interface{}) (in
 	if config.GetConfig().Server.Debug == constant.True {
 		db = db.Debug()
 	}
-
+	fmt.Println(user, "aa")
 	if err := db.Create(&user).Error; err != nil {
 		tracer.LogError(sp, tracer.CallDatabase, err)
 		return nil, err

@@ -28,4 +28,5 @@ type GetUserResponse struct {
 	CreatedAt string
 	UpdateAt  string
 	DeletedAt string
+	Role      GetRoleResponse
 }

@@ -12,6 +12,7 @@ type RefreshToken struct {
 	RefreshToken string `gorm:"size:36"`
 
 	AccessTokenId string
+	AccessToken   AccessToken
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
