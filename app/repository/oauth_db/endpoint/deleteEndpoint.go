@@ -6,8 +6,8 @@ import (
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/model"
 	"github.com/evenyosua18/oauth/config"
 	"github.com/evenyosua18/oauth/util/tracer"
-	"github.com/jinzhu/gorm"
 	"github.com/mitchellh/mapstructure"
+	"gorm.io/gorm"
 )
 
 type deleteEndpointRequest struct {

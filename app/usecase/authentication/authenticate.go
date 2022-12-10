@@ -8,6 +8,7 @@ import (
 	"github.com/evenyosua18/oauth/util/tracer"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/trace"
+	"strings"
 	"time"
 )
 
@@ -44,6 +45,42 @@ func (i *InteractionAuthentication) Authenticate(context context.Context, in int
 		return constant.ErrInvalidToken(constant.ErrMessageInvalidExpiredTime)
 	}
 
+	var scope string
+	if accessToken.GrantType == constant.ClientCredentials {
+		//get oauth client
+		oauthClient, err := i.getOauthClient(ctx, sp, accessToken.OauthClientId)
+
+		if err != nil {
+			return err
+		}
+
+		scope = oauthClient.Scopes
+
+	} else {
+		//get user
+		user, err := i.getUser(ctx, sp, accessToken.UserId)
+
+		if err != nil {
+			return err
+		}
+
+		//check role has permission can access the target
+
+		scope = user.Scopes + constant.ScopeSeparator + user.Role.Scopes
+	}
+
+	//check request scope is exist
+	tracer.LogInfo(sp, scope)
+	scopeExist := checkScope(accessToken.Scope, scope)
+	tracer.LogResponse(sp, scopeExist)
+
+	if !scopeExist {
+		tracer.LogError(sp, tracer.Checking, constant.ErrInvalidScope(""))
+		return constant.ErrInvalidScope("")
+	}
+
+	//check scope has permission to access target endpoint
+
 	tracer.LogResponse(sp, accessToken)
 	return nil
 }
@@ -67,4 +104,56 @@ func (i *InteractionAuthentication) getAccessToken(ctx context.Context, sp trace
 
 	tracer.LogResponse(sp, accessToken)
 	return accessToken, nil
+}
+
+func (i *InteractionAuthentication) getOauthClient(ctx context.Context, sp trace.Span, id string) (*entity.GetOauthClientResponse, error) {
+	//get oauth client by id
+	oauthClientResponse, err := i.oauthClient.GetOauthClient(ctx, entity.GetOauthClientRequest{ClientId: id})
+
+	if err != nil {
+		tracer.LogError(sp, tracer.CallRepository, err)
+		return nil, err
+	}
+
+	//decode oauth client
+	var oauthClient *entity.GetOauthClientResponse
+	if err := mapstructure.Decode(oauthClientResponse, &oauthClient); err != nil {
+		tracer.LogError(sp, tracer.DecodeObject, err)
+		return nil, err
+	}
+
+	return oauthClient, nil
+}
+
+func (i *InteractionAuthentication) getUser(ctx context.Context, sp trace.Span, id string) (*entity.GetUserResponse, error) {
+	//get user
+	userResponse, err := i.user.GetUser(ctx, entity.GetUserRequest{Id: id})
+
+	if err != nil {
+		tracer.LogError(sp, tracer.CallRepository, err)
+		return nil, err
+	}
+
+	//decode
+	var user *entity.GetUserResponse
+	if err := mapstructure.Decode(userResponse, &user); err != nil {
+		tracer.LogError(sp, tracer.DecodeObject, err)
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func checkScope(reqScope, listScope string) bool {
+	//split req scope
+	listRequestScope := strings.Split(reqScope, constant.ScopeSeparator)
+
+	//loop every request scope
+	for _, scope := range listRequestScope {
+		if !strings.Contains(scope, listScope) {
+			return false
+		}
+	}
+
+	return true
 }

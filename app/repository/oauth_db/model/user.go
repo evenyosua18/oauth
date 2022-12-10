@@ -43,17 +43,17 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (u User) GetIdColumn() string {
-	return "id"
+	return string(constant.UserTable) + ".id"
 }
 
 func (u User) GetNameColumn() string {
-	return "name"
+	return string(constant.UserTable) + ".name"
 }
 
 func (u User) GetEmailColumn() string {
-	return "email"
+	return string(constant.UserTable) + ".email"
 }
 
 func (u User) GetPhoneColumn() string {
-	return "phone"
+	return string(constant.UserTable) + ".phone"
 }

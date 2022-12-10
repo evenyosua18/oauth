@@ -4,7 +4,7 @@ import (
 	"github.com/evenyosua18/oauth/app/repository/oauth_db/model"
 	"github.com/evenyosua18/oauth/config"
 	dbUtil "github.com/evenyosua18/oauth/util/db"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func InitDatabase() (err error) {

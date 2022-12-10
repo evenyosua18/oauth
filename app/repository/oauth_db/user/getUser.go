@@ -46,7 +46,7 @@ func (r *RepositoryUser) GetUser(context context.Context, in interface{}) (inter
 	}
 
 	//call db
-	if err := db.Take(&user).Error; err != nil {
+	if err := db.Joins(user.Role.JoinName()).Take(&user).Error; err != nil {
 		tracer.LogError(sp, tracer.CallDatabase, err)
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/evenyosua18/oauth/app/constant"
+	"reflect"
 	"time"
 )
 
@@ -22,4 +23,8 @@ type Role struct {
 
 func (Role) TableName() string {
 	return string(constant.RoleTable)
+}
+
+func (r Role) JoinName() string {
+	return reflect.TypeOf(r).Name()
 }

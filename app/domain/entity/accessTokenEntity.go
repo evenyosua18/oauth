@@ -20,6 +20,7 @@ type GetAccessTokenResponse struct {
 	ExpireAt      string
 	UserId        string
 	OauthClientId string
+	Scope         string
 	GrantType     string
 	CreatedAt     string
 	UpdateAt      string
